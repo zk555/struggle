@@ -18,4 +18,8 @@ public interface MenuMapper {
 
 	List<MenuDO> listMenuByUserId(Long id);
 
+	List<String> listUserPerms(Long id);
+
+
+
 }

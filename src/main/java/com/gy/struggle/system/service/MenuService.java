@@ -14,5 +14,5 @@ public interface MenuService {
 
 	List<Tree<MenuDO>> listMenuTree(Long id);
 
-
+	Set<String> listPerms(Long userId);
 }

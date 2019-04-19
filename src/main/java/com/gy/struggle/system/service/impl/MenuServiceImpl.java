@@ -43,4 +43,15 @@ public class MenuServiceImpl implements MenuService {
 		return list;
 	}
 
+	@Override
+	public Set<String> listPerms(Long userId) {
+		List<String> perms = menuMapper.listUserPerms(userId);
+		Set<String> permsSet = new HashSet<>();
+		for (String perm : perms) {
+			if (StringUtils.isNotBlank(perm)) {
+				permsSet.addAll(Arrays.asList(perm.trim().split(",")));
+			}
+		}
+		return permsSet;
+	}
 }

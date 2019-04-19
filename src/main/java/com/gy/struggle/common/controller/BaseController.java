@@ -11,7 +11,7 @@ public class BaseController {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public UserDO getUser() {
-		return ShiroUtils.getUser();
+		return  ShiroUtils.getUser();
 	}
 
 	public Long getUserId() {

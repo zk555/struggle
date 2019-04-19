@@ -18,4 +18,13 @@
 		m.order_num
 	</select>
 
+	<select id="listUserPerms" resultType="string">
+		select distinct m.perms
+		from sys_menu m left join
+		sys_role_menu rm on m.menu_id = rm.menu_id
+		left join sys_user_role ur
+		on rm.role_id = ur.role_id where ur.user_id
+		= #{id}
+	</select>
+
 </mapper>
