@@ -17,4 +17,5 @@ public interface DeptMapper {
 
 	DeptDO get(Long deptId);
 
+	List<DeptDO> list(Map<String,Object> map);
 }

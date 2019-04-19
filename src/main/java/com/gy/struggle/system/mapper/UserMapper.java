@@ -22,4 +22,6 @@ public interface UserMapper {
 	List<UserDO> getUserByName(String username,@Param("id") String id);
 
 	List<UserDO> list(Map<String,Object> map);
+
+	int count(Map<String,Object> map);
 }

@@ -16,6 +16,8 @@ import java.util.Map;
 public interface DeptService {
 	
 	DeptDO get(Long deptId);
-	
 
+	List<Long> listChildrenIds(Long parentId);
+
+	List<DeptDO> list(Map<String, Object> map);
 }

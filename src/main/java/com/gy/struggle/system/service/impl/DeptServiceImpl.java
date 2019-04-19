@@ -22,4 +22,26 @@ public class DeptServiceImpl implements DeptService {
         return sysDeptMapper.get(deptId);
     }
 
+    @Override
+    public List<Long> listChildrenIds(Long parentId) {
+        List<DeptDO> deptDOS = list(null);
+        return treeMenuList(deptDOS, parentId);
+    }
+    @Override
+    public List<DeptDO> list(Map<String, Object> map) {
+        return sysDeptMapper.list(map);
+    }
+
+    List<Long> treeMenuList(List<DeptDO> menuList, long pid) {
+        List<Long> childIds = new ArrayList<>();
+        for (DeptDO mu : menuList) {
+            //遍历出父id等于参数的id，add进子节点集合
+            if (mu.getParentId() == pid) {
+                //递归遍历下一级
+                treeMenuList(menuList, mu.getDeptId());
+                childIds.add(mu.getDeptId());
+            }
+        }
+        return childIds;
+    }
 }
