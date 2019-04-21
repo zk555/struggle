@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
 <meta charset="utf-8">
 <head th:include="include :: header"></head>
 <body class="gray-bg">
@@ -47,7 +47,7 @@
 							<div class="form-group">
 								<label class="col-sm-2 control-label">任务描述：</label>
 								<div class="col-sm-10">
-									<textarea id="description" name="description" class="form-control"
+									<textarea id="description" name="description" class="form-control" th:text="${job.description}"
 										></textarea>
 								</div>
 							</div>
