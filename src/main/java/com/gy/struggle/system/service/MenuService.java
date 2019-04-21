@@ -11,8 +11,21 @@ import java.util.Set;
 @Service
 public interface MenuService {
 
+	MenuDO get(Long id);
 
 	List<Tree<MenuDO>> listMenuTree(Long id);
 
 	Set<String> listPerms(Long userId);
+
+	Tree<MenuDO> getTree();
+
+	Tree<MenuDO> getTree(Long id);
+
+	List<MenuDO> list(Map<String, Object> params);
+
+	int save(MenuDO menu);
+
+	int remove(Long id);
+
+	int update(MenuDO menu);
 }

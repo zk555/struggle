@@ -24,4 +24,13 @@ public interface UserMapper {
 	List<UserDO> list(Map<String,Object> map);
 
 	int count(Map<String,Object> map);
+
+	int save(UserDO user);
+
+	int batchRemove(Long[] userIds);
+
+	int remove(Long userId);
+
+	int update(UserDO user);
+
 }

@@ -19,6 +19,7 @@ function load() {
 				bordered : true, // 是否显示边框
 				expandAll : false, // 是否全部展开
 				// toolbar : '#exampleToolbar',
+                // search : true, // 是否显示搜索框
 				columns : [
 					{
 						title : '编号',

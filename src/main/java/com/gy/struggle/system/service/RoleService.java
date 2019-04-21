@@ -8,17 +8,17 @@ import java.util.List;
 @Service
 public interface RoleService {
 
-	/*RoleDO get(Long id);
+    RoleDO get(Long id);
 
-	List<RoleDO> list();
+    List<RoleDO> list();
 
-	int save(RoleDO role);
+    List<RoleDO> list(Long userId);
 
-	int update(RoleDO role);
+    int save(RoleDO role);
 
-	int remove(Long id);
+    int remove(Long id);
 
-	List<RoleDO> list(Long userId);
+    int batchremove(Long[] ids);
 
-	int batchremove(Long[] ids);*/
+    int update(RoleDO role);
 }

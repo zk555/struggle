@@ -8,9 +8,6 @@ import java.util.Map;
 
 /**
  * 部门管理
- * @author chglee
- * @email 1992lcg@163.com
- * @date 2017-10-03 15:35:39
  */
 @Mapper
 public interface DeptMapper {
@@ -18,4 +15,17 @@ public interface DeptMapper {
 	DeptDO get(Long deptId);
 
 	List<DeptDO> list(Map<String,Object> map);
+
+	int save(DeptDO dept);
+
+	int count(Map<String,Object> map);
+
+	int getDeptUserNumber(Long deptId);
+
+	int remove(Long deptId);
+
+	int batchRemove(Long[] deptIds);
+
+	int update(DeptDO dept);
+
 }

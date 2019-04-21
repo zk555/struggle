@@ -22,6 +22,17 @@ public class MenuServiceImpl implements MenuService {
 	@Autowired
 	RoleMenuMapper roleMenuMapper;
 
+	@Override
+	public MenuDO get(Long id) {
+		MenuDO menuDO = menuMapper.get(id);
+		return menuDO;
+	}
+
+	@Override
+	public List<MenuDO> list(Map<String, Object> params) {
+		List<MenuDO> menus = menuMapper.list(params);
+		return menus;
+	}
 
 	@Override
 	public List<Tree<MenuDO>> listMenuTree(Long id) {
@@ -53,5 +64,75 @@ public class MenuServiceImpl implements MenuService {
 			}
 		}
 		return permsSet;
+	}
+
+	@Override
+	public Tree<MenuDO> getTree() {
+		List<Tree<MenuDO>> trees = new ArrayList<Tree<MenuDO>>();
+		List<MenuDO> menuDOs = menuMapper.list(new HashMap<>(16));
+		for (MenuDO sysMenuDO : menuDOs) {
+			Tree<MenuDO> tree = new Tree<MenuDO>();
+			tree.setId(sysMenuDO.getMenuId().toString());
+			tree.setParentId(sysMenuDO.getParentId().toString());
+			tree.setText(sysMenuDO.getName());
+			trees.add(tree);
+		}
+		// 默认顶级菜单为０，根据数据库实际情况调整
+		Tree<MenuDO> t = BuildTree.build(trees);
+		return t;
+	}
+
+	@Override
+	public Tree<MenuDO> getTree(Long id) {
+		// 根据roleId查询权限
+		List<MenuDO> menus = menuMapper.list(new HashMap<String, Object>(16));
+		List<Long> menuIds = roleMenuMapper.listMenuIdByRoleId(id);
+		List<Long> temp = menuIds;
+		for (MenuDO menu : menus) {
+			if (temp.contains(menu.getParentId())) {
+				menuIds.remove(menu.getParentId());
+			}
+		}
+		List<Tree<MenuDO>> trees = new ArrayList<Tree<MenuDO>>();
+		List<MenuDO> menuDOs = menuMapper.list(new HashMap<String, Object>(16));
+		for (MenuDO sysMenuDO : menuDOs) {
+			Tree<MenuDO> tree = new Tree<MenuDO>();
+			tree.setId(sysMenuDO.getMenuId().toString());
+			tree.setParentId(sysMenuDO.getParentId().toString());
+			tree.setText(sysMenuDO.getName());
+			Map<String, Object> state = new HashMap<>(16);
+			Long menuId = sysMenuDO.getMenuId();
+			if (menuIds.contains(menuId)) {
+				state.put("selected", true);
+			} else {
+				state.put("selected", false);
+			}
+			tree.setState(state);
+			trees.add(tree);
+		}
+		// 默认顶级菜单为０，根据数据库实际情况调整
+		Tree<MenuDO> t = BuildTree.build(trees);
+		return t;
+	}
+
+	@Transactional(readOnly = false,rollbackFor = Exception.class)
+	@Override
+	public int save(MenuDO menu) {
+		int r = menuMapper.save(menu);
+		return r;
+	}
+
+	@Transactional(readOnly = false,rollbackFor = Exception.class)
+	@Override
+	public int remove(Long id) {
+		int result = menuMapper.remove(id);
+		return result;
+	}
+
+	@Transactional(readOnly = false,rollbackFor = Exception.class)
+	@Override
+	public int update(MenuDO menu) {
+		int r = menuMapper.update(menu);
+		return r;
 	}
 }

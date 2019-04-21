@@ -20,6 +20,13 @@ public interface MenuMapper {
 
 	List<String> listUserPerms(Long id);
 
+	List<MenuDO> list(Map<String,Object> map);
 
+	MenuDO get(Long menuId);
 
+	int save(MenuDO menu);
+
+	int remove(Long menuId);
+
+	int update(MenuDO menu);
 }
