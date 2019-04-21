@@ -6,6 +6,8 @@ import com.gy.struggle.common.domain.Tree;
 import com.gy.struggle.common.utils.R;
 import com.gy.struggle.system.domain.DeptDO;
 import com.gy.struggle.system.service.DeptService;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +36,10 @@ public class DeptController extends BaseController {
 		return prefix + "/dept";
 	}
 
-	@ApiOperation(value="获取部门列表", notes="")
+	@ApiOperation(value="获取部门列表", notes="查询所有部门信息")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name ="id", value ="用户ID", required =true, dataType ="Long"),
+			@ApiImplicitParam(name ="user", value ="用户详细实体user", required =true, dataType ="User") })
 	@ResponseBody
 	@GetMapping("/list")
 	@RequiresPermissions("system:sysDept:sysDept")
@@ -44,6 +49,7 @@ public class DeptController extends BaseController {
 		return sysDeptList;
 	}
 
+	@ApiOperation(value="获取tree", notes="查询树节点信息")
 	@GetMapping("/tree")
 	@ResponseBody
 	public Tree<DeptDO> tree() {
@@ -57,6 +63,9 @@ public class DeptController extends BaseController {
 		return  prefix + "/deptTree";
 	}
 
+	@ApiOperation(value="新增部门挑战页面", notes="根据ID，新增部门信息")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name ="id", value ="部门ID", required =true, dataType ="Long") })
 	@GetMapping("/add/{pId}")
 	@RequiresPermissions("system:sysDept:add")
 	String add(@PathVariable("pId") Long pId, Model model) {
