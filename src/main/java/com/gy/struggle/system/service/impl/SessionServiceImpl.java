@@ -89,6 +89,7 @@ public class SessionServiceImpl implements SessionService {
     public boolean forceLogout(String sessionId) {
         Session session = sessionDAO.readSession(sessionId);
         session.setTimeout(0);
+        sessionDAO.delete(session); //强制删除redis缓存中的登录信息
         return true;
     }
 }
