@@ -8,7 +8,11 @@
 	</select>
 
 	<select id="getUserByName" resultType="com.gy.struggle.system.domain.UserDO">
-		select `user_id`,`username`,`name`,`password`,`dept_id`,`email`,`mobile`,`status`,`user_id_create`,`gmt_create`,`gmt_modified`,`sex`,`birth`,`pic_id`,`live_address`,`hobby`,`province`,`city`,`district` from sys_user where username in (${id})
+		select `user_id`,`username`,`name`,`password`,`dept_id`,`email`,`mobile`,`status`,`user_id_create`,`gmt_create`,`gmt_modified`,`sex`,`birth`,`pic_id`,`live_address`,`hobby`,`province`,`city`,`district` from sys_user
+		 where username in
+		 <foreach collection="ids" item="mcc" index="index" open="(" separator="," close=")">
+			 #{mcc}
+		 </foreach>
 	</select>
 
 	<select id="list" resultType="com.gy.struggle.system.domain.UserDO">

@@ -19,7 +19,7 @@ public interface UserMapper {
 
 	UserDO get(Long userId);
 
-	List<UserDO> getUserByName(String username,@Param("id") String id);
+	List<UserDO> getUserByName(String username,@Param("ids") List ids);
 
 	List<UserDO> list(Map<String,Object> map);
 
