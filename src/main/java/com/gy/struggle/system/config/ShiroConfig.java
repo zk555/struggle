@@ -192,7 +192,7 @@ public class ShiroConfig {
         sessionManager.setGlobalSessionTimeout(tomcatTimeout * 1000);
         sessionManager.setSessionDAO(sessionDAO());
         Collection<SessionListener> listeners = new ArrayList<SessionListener>();
-        listeners.add(new BDSessionListener());
+        listeners.add(new BDSessionListener());  //加入自定义session监听器
         sessionManager.setSessionListeners(listeners);
         return sessionManager;
     }

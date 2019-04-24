@@ -5,6 +5,9 @@ import org.apache.shiro.session.SessionListener;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Session 监听类 ——》 记录当前在线人数
+ */
 public class BDSessionListener implements SessionListener {
 
 	private final AtomicInteger sessionCount = new AtomicInteger(0);
