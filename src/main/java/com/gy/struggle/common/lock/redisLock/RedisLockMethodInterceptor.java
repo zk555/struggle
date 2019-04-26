@@ -1,6 +1,6 @@
 package com.gy.struggle.common.lock.redisLock;
 
-import com.gy.struggle.common.annotation.CacheLock;
+import com.gy.struggle.common.annotation.RedisLock;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -17,28 +17,28 @@ import java.lang.reflect.Method;
  */
 @Aspect
 @Configuration
-public class LockMethodInterceptor {
+public class RedisLockMethodInterceptor {
 
     private final StringRedisTemplate lockRedisTemplate;
 
-    private final CacheKeyGenerator cacheKeyGenerator;
+    private final RedisKeyGenerator redisKeyGenerator;
 
     @Autowired
-     public LockMethodInterceptor(StringRedisTemplate lockRedisTemplate, CacheKeyGenerator cacheKeyGenerator) {
+     public RedisLockMethodInterceptor(StringRedisTemplate lockRedisTemplate, RedisKeyGenerator redisKeyGenerator) {
                  this.lockRedisTemplate = lockRedisTemplate;
-                 this.cacheKeyGenerator = cacheKeyGenerator;
+                 this.redisKeyGenerator = redisKeyGenerator;
       }
 
-    @Around("execution(public * *(..)) && @annotation(com.gy.struggle.common.annotation.CacheLock)")
+    @Around("execution(public * *(..)) && @annotation(com.gy.struggle.common.annotation.RedisLock)")
     public Object interceptor(ProceedingJoinPoint pjp) {
          MethodSignature signature = (MethodSignature) pjp.getSignature();
          Method method = signature.getMethod();
-         CacheLock lock = method.getAnnotation(CacheLock.class);
+         RedisLock lock = method.getAnnotation(RedisLock.class);
          //如果前置为空直接抛出异常
          if (StringUtils.isEmpty(lock.prefix())) {
                  throw new RuntimeException("lock key can't be null...");
           }
-         final String lockKey = cacheKeyGenerator.getLockKey(lock ,pjp.getArgs(),method.getParameters(),method);
+         final String lockKey = redisKeyGenerator.getLockKey(lock ,pjp.getArgs(),method.getParameters(),method);
          try {
                  //key不存在才能设置成功
                  final Boolean success = lockRedisTemplate.opsForValue().setIfAbsent(lockKey, "加锁");

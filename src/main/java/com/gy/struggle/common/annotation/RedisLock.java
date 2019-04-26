@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-public @interface CacheLock {
+public @interface RedisLock {
     /**
      * redis 锁key前缀
      * @return
