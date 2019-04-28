@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class LockController {
 
     @RedisLock(prefix = "controller",expire = 50)
+
     public String query(@RedisParam(name = "token") @RequestParam String token) {
              return "success - " + token;
      }

@@ -55,7 +55,7 @@ public class RedisLockMethodInterceptor {
                      }
              } finally {
                  //如果演示的话需要注释该代码;实际应该放开
-                  lockRedisTemplate.delete(lockKey);
+//                  lockRedisTemplate.delete(lockKey);
          }
     }
 }
