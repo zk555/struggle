@@ -1,19 +1,25 @@
 package com.gy.struggle;
 
 import com.gy.struggle.common.amqp.kafka.KafkaSender;
+import com.gy.struggle.common.amqp.rabbitmq.HelloSender;
+import com.gy.struggle.common.amqp.rabbitmq.TopicSender;
+import com.gy.struggle.common.amqp.rabbitmq.UserSender;
 import com.gy.struggle.common.controller.LockController;
 import com.gy.struggle.common.utils.StringUtils;
 import com.gy.struggle.system.domain.UserDO;
 import com.gy.struggle.system.mapper.UserMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
@@ -51,6 +57,27 @@ public class StruggleApplicationTests {
     public void redisTest() throws IOException {
         String name = lockController.query("name");
         System.out.println("name = " + name);
+    }
+
+    @Autowired
+    private HelloSender helloSender1;
+    @Autowired
+    private UserSender userSender;
+
+    @Autowired
+    private TopicSender topicSender;
+    @Test
+    public void hello() {
+        helloSender1.send();
+    }
+
+    @Test
+    public void helloUser() {
+        userSender.send();
+    }
+    @Test
+    public void topicSender() {
+        topicSender.send();
     }
 
 
