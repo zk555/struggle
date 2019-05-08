@@ -87,4 +87,8 @@
 		</set>
 		where dept_id = #{deptId}
 	</update>
+
+	<select id="listParentDept" resultType="long">
+		select DISTINCT parent_id from sys_dept
+	</select>
 </mapper>

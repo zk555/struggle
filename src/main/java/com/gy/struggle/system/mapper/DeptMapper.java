@@ -28,4 +28,5 @@ public interface DeptMapper {
 
 	int update(DeptDO dept);
 
+	Long[] listParentDept();
 }

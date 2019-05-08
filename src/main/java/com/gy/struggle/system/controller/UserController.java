@@ -176,4 +176,17 @@ public class UserController extends BaseController {
 		}
 
 	}
+
+	@GetMapping("/tree")
+	@ResponseBody
+	public Tree<DeptDO> tree() {
+		Tree<DeptDO> tree = new Tree<DeptDO>();
+		tree = userService.getTree();
+		return tree;
+	}
+
+	@GetMapping("/treeView")
+	String treeView() {
+		return  prefix + "/userTree";
+	}
 }

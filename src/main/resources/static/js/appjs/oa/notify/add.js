@@ -9,6 +9,16 @@ $.validator.setDefaults({
 	}
 });
 function save() {
+	//TODO ; 图片上传功能待修复
+    // var file = checkFile();
+    // if (!file) {
+    //     alert('请先选择文件');
+    //     return false;
+    // };
+    // // 构建form数据
+    // var formFile = new FormData();
+    // //把文件放入form对象中
+    // formFile.append("file", file);
 	$.ajax({
 		cache : true,
 		type : "POST",
@@ -88,3 +98,15 @@ function loadUser(userIds,userNames){
 	$("#userIds").val(userIds);
 	$("#userNames").val(userNames);
 }
+
+// 检测是否选择文件，如果选择，返回文件对象;如果没选择，返回false
+function checkFile() {
+    // 获取文件对象(该对象的类型是[object FileList]，其下有个length属性)
+    var fileList = $('#files')[0].files;
+    // 如果文件对象的length属性为0，就是没文件
+    if (fileList.length === 0) {
+        console.log('没选择文件');
+        return false;
+    };
+    return fileList[0];
+};

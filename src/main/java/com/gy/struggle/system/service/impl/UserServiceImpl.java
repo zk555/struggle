@@ -2,11 +2,13 @@ package com.gy.struggle.system.service.impl;
 
 import com.gy.struggle.common.config.StruggleConfig;
 import com.gy.struggle.common.domain.FileDO;
+import com.gy.struggle.common.domain.Tree;
 import com.gy.struggle.common.service.FileService;
 import com.gy.struggle.common.utils.BuildTree;
 import com.gy.struggle.common.utils.FileUtil;
 import com.gy.struggle.common.utils.MD5Utils;
 import com.gy.struggle.common.utils.StringUtils;
+import com.gy.struggle.system.domain.DeptDO;
 import com.gy.struggle.system.domain.UserDO;
 import com.gy.struggle.system.domain.UserRoleDO;
 import com.gy.struggle.system.mapper.DeptMapper;
@@ -150,8 +152,44 @@ public class UserServiceImpl implements UserService {
         }
         userDO.setPassword(MD5Utils.encrypt(userDO.getUsername(), userVO.getPwdNew()));
         return userMapper.update(userDO);
+    }
 
-
+    @Override
+    public Tree<DeptDO> getTree() {
+        List<Tree<DeptDO>> trees = new ArrayList<Tree<DeptDO>>();
+        List<DeptDO> depts = deptMapper.list(new HashMap<String, Object>(16));
+        Long[] pDepts = deptMapper.listParentDept();
+        Long[] uDepts = userMapper.listAllDept();
+        Long[] allDepts = (Long[]) ArrayUtils.addAll(pDepts, uDepts);
+        for (DeptDO dept : depts) {
+            if (!ArrayUtils.contains(allDepts, dept.getDeptId())) {
+                continue;
+            }
+            Tree<DeptDO> tree = new Tree<DeptDO>();
+            tree.setId(dept.getDeptId().toString());
+            tree.setParentId(dept.getParentId().toString());
+            tree.setText(dept.getName());
+            Map<String, Object> state = new HashMap<>(16);
+            state.put("opened", true);
+            state.put("mType", "dept");
+            tree.setState(state);
+            trees.add(tree);
+        }
+        List<UserDO> users = userMapper.list(new HashMap<String, Object>(16));
+        for (UserDO user : users) {
+            Tree<DeptDO> tree = new Tree<DeptDO>();
+            tree.setId(user.getUserId().toString());
+            tree.setParentId(user.getDeptId().toString());
+            tree.setText(user.getName());
+            Map<String, Object> state = new HashMap<>(16);
+            state.put("opened", true);
+            state.put("mType", "user");
+            tree.setState(state);
+            trees.add(tree);
+        }
+        // 默认顶级菜单为０，根据数据库实际情况调整
+        Tree<DeptDO> t = BuildTree.build(trees);
+        return t;
     }
 }
 

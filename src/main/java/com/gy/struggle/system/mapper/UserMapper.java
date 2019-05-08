@@ -33,4 +33,6 @@ public interface UserMapper {
 
 	int update(UserDO user);
 
+	Long[] listAllDept();
+
 }

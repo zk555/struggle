@@ -31,4 +31,6 @@ public interface UserService {
 	int resetPwd(UserVO userVO,UserDO userDO) throws Exception;
 
 	int adminResetPwd(UserVO userVO) throws Exception;
+
+	Tree<DeptDO> getTree();
 }
