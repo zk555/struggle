@@ -1,0 +1,212 @@
+package com.gy.struggle.activiti.controller;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.gy.struggle.common.config.Constant;
+import com.gy.struggle.common.controller.BaseController;
+import com.gy.struggle.common.utils.PageUtils;
+import com.gy.struggle.common.utils.R;
+import org.activiti.editor.constants.ModelDataJsonConstants;
+import org.activiti.engine.ActivitiException;
+import org.activiti.engine.RepositoryService;
+import org.activiti.engine.repository.Model;
+import org.activiti.engine.repository.ModelQuery;
+import org.apache.batik.transcoder.TranscoderInput;
+import org.apache.batik.transcoder.TranscoderOutput;
+import org.apache.batik.transcoder.image.PNGTranscoder;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.util.List;
+
+import static org.activiti.editor.constants.ModelDataJsonConstants.MODEL_DESCRIPTION;
+import static org.activiti.editor.constants.ModelDataJsonConstants.MODEL_ID;
+import static org.activiti.editor.constants.ModelDataJsonConstants.MODEL_NAME;
+
+@RequestMapping("/activiti")
+@RestController
+public class ModelController extends BaseController {
+
+    @Autowired
+    private RepositoryService repositoryService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @GetMapping("/model")
+    ModelAndView model() {
+        return new ModelAndView("act/model/model");
+    }
+
+    /**
+     * 查询：ACT_RE_MODEL
+     * @param offset
+     * @param limit
+     * @return
+     */
+    @GetMapping("/model/list")
+    PageUtils list(int offset, int limit,String name) {
+        List<Model> list = null;
+        ModelQuery modelQuery = repositoryService.createModelQuery();
+        if (com.gy.struggle.common.utils.StringUtils.isNotEmpty(name)){
+            list =  modelQuery.modelName(name).listPage(offset
+                    , limit);
+        }else {
+            list =  modelQuery.listPage(offset
+                    , limit);
+        }
+        int total = (int) repositoryService.createModelQuery().count();
+        PageUtils pageUtil = new PageUtils(list, total);
+        return pageUtil;
+    }
+
+    @RequestMapping("/model/add")
+    public void newModel(HttpServletResponse response) throws UnsupportedEncodingException {
+
+        //初始化一个空模型
+        Model model = repositoryService.newModel();
+        //设置一些默认信息
+        String name = "new-process";
+        String description = "";
+        int revision = 1;
+        String key = "process";
+
+        ObjectNode modelNode = objectMapper.createObjectNode();
+        modelNode.put(ModelDataJsonConstants.MODEL_NAME, name);
+        modelNode.put(ModelDataJsonConstants.MODEL_DESCRIPTION, description);
+        modelNode.put(ModelDataJsonConstants.MODEL_REVISION, revision);
+
+        model.setName(name);
+        model.setKey(key);
+        model.setMetaInfo(modelNode.toString());
+
+        repositoryService.saveModel(model);
+        String id = model.getId();
+
+        //完善ModelEditorSource
+        ObjectNode editorNode = objectMapper.createObjectNode();
+        editorNode.put("id", "canvas");
+        editorNode.put("resourceId", "canvas");
+        ObjectNode stencilSetNode = objectMapper.createObjectNode();
+        stencilSetNode.put("namespace",
+                "http://b3mn.org/stencilset/bpmn2.0#");
+        editorNode.put("stencilset", stencilSetNode);
+        repositoryService.addModelEditorSource(id, editorNode.toString().getBytes("utf-8"));
+        try {
+            response.sendRedirect("/modeler.html?modelId=" + id);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @GetMapping(value = "/model/{modelId}/json")
+    public ObjectNode getEditorJson(@PathVariable String modelId) {
+        ObjectNode modelNode = null;
+        Model model = repositoryService.getModel(modelId);
+        if (model != null) {
+            try {
+                if (StringUtils.isNotEmpty(model.getMetaInfo())) {
+                    modelNode = (ObjectNode) objectMapper.readTree(model.getMetaInfo());
+                } else {
+                    modelNode = objectMapper.createObjectNode();
+                    modelNode.put(MODEL_NAME, model.getName());
+                }
+                modelNode.put(MODEL_ID, model.getId());
+                ObjectNode editorJsonNode = (ObjectNode) objectMapper.readTree(
+                        new String(repositoryService.getModelEditorSource(model.getId()), "utf-8"));
+                modelNode.put("model", editorJsonNode);
+
+            } catch (Exception e) {
+                logger.error("Error creating model JSON", e);
+                throw new ActivitiException("Error creating model JSON", e);
+            }
+        }
+        return modelNode;
+    }
+
+    @RequestMapping(value = "/editor/stencilset", method = RequestMethod.GET, produces = "application/json;charset=utf-8")
+    public String getStencilset() {
+        InputStream stencilsetStream = this.getClass().getClassLoader().getResourceAsStream("stencilset.json");
+        try {
+            return IOUtils.toString(stencilsetStream, "utf-8");
+        } catch (Exception e) {
+            throw new ActivitiException("Error while loading stencil set", e);
+        }
+    }
+
+
+    @RequestMapping(value = "/model/{modelId}/save", method = RequestMethod.PUT)
+    @ResponseStatus(value = HttpStatus.OK)
+    public void saveModel(@PathVariable String modelId
+            , String name, String description
+            , String json_xml, String svg_xml) {
+        try {
+
+            Model model = repositoryService.getModel(modelId);
+
+            ObjectNode modelJson = (ObjectNode) objectMapper.readTree(model.getMetaInfo());
+
+            modelJson.put(MODEL_NAME, name);
+            modelJson.put(MODEL_DESCRIPTION, description);
+            model.setMetaInfo(modelJson.toString());
+            model.setName(name);
+
+            repositoryService.saveModel(model);
+
+            repositoryService.addModelEditorSource(model.getId(), json_xml.getBytes("utf-8"));
+
+            InputStream svgStream = new ByteArrayInputStream(svg_xml.getBytes("utf-8"));
+            TranscoderInput input = new TranscoderInput(svgStream);
+
+            PNGTranscoder transcoder = new PNGTranscoder();
+            // Setup output
+            ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+            TranscoderOutput output = new TranscoderOutput(outStream);
+
+            // Do the transformation
+            transcoder.transcode(input, output);
+            final byte[] result = outStream.toByteArray();
+            repositoryService.addModelEditorSourceExtra(model.getId(), result);
+            outStream.close();
+
+        } catch (Exception e) {
+            logger.error("Error saving model", e);
+            throw new ActivitiException("Error saving model", e);
+        }
+    }
+
+    @GetMapping("/model/edit/{id}")
+    public void edit(HttpServletResponse response, @PathVariable("id") String id) {
+        try {
+            response.sendRedirect("/modeler.html?modelId=" + id);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @DeleteMapping("/model/{id}")
+    public R remove(@PathVariable("id") String id) {
+        if (Constant.DEMO_ACCOUNT.equals(getUsername())) {
+//            return R.error(1, "演示系统不允许修改,完整体验请部署程序");
+        }
+        repositoryService.deleteModel(id);
+        return R.ok();
+    }
+
+    @PostMapping("/model/batchRemove")
+    public R batchRemove(@RequestParam("ids[]") String[] ids) {
+        if (Constant.DEMO_ACCOUNT.equals(getUsername())) {
+//            return R.error(1, "演示系统不允许修改,完整体验请部署程序");
+        }
+        for (String id : ids) {
+            repositoryService.deleteModel(id);
+        }
+        return R.ok();
+    }
+}

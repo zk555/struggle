@@ -9,7 +9,7 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class BaseController {
 
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public UserDO getUser() {
 		return  ShiroUtils.getUser();

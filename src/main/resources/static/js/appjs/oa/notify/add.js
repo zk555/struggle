@@ -109,4 +109,4 @@ function checkFile() {
         return false;
     };
     return fileList[0];
-};
+}
