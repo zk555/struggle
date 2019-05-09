@@ -1,7 +1,6 @@
 package com.gy.struggle.system.mapper;
 
 import com.gy.struggle.system.domain.RoleDO;
-import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 import java.util.Map;
@@ -9,7 +8,6 @@ import java.util.Map;
 /**
  * 角色mapper
  */
-@Mapper
 public interface RoleMapper {
 
 	RoleDO get(Long roleId);

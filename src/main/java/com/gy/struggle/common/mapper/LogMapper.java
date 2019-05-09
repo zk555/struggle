@@ -1,7 +1,6 @@
 package com.gy.struggle.common.mapper;
 
 import com.gy.struggle.common.domain.LogDO;
-import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 import java.util.Map;
@@ -9,7 +8,7 @@ import java.util.Map;
 /**
  * 系统日志
  */
-@Mapper
+
 public interface LogMapper {
 
 	LogDO get(Long id);

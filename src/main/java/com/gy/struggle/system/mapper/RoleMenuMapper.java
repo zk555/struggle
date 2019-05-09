@@ -1,7 +1,6 @@
 package com.gy.struggle.system.mapper;
 
 import com.gy.struggle.system.domain.RoleMenuDO;
-import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 import java.util.Map;
@@ -12,7 +11,6 @@ import java.util.Map;
  * @email 1992lcg@163.com
  * @date 2017-10-03 11:08:59
  */
-@Mapper
 public interface RoleMenuMapper {
 
 	RoleMenuDO get(Long id);

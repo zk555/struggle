@@ -2,7 +2,6 @@ package com.gy.struggle.system.mapper;
 
 
 import com.gy.struggle.system.domain.UserRoleDO;
-import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 import java.util.Map;
@@ -10,7 +9,6 @@ import java.util.Map;
 /**
  * 用户与角色对应关系
  */
-@Mapper
 public interface UserRoleMapper {
 
 	UserRoleDO get(Long id);

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.gy.struggle.common.domain.FileDO;
-import org.apache.ibatis.annotations.Mapper;
 
 /**
  * 文件上传
@@ -13,7 +12,7 @@ import org.apache.ibatis.annotations.Mapper;
  * @email 1992lcg@163.com
  * @date 2017-10-03 15:45:42
  */
-@Mapper
+
 public interface FileMapper {
 
 	FileDO get(Long id);

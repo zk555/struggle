@@ -1,7 +1,6 @@
 package com.gy.struggle.system.mapper;
 
 import com.gy.struggle.system.domain.DeptDO;
-import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 import java.util.Map;
@@ -9,7 +8,6 @@ import java.util.Map;
 /**
  * 部门管理
  */
-@Mapper
 public interface DeptMapper {
 
 	DeptDO get(Long deptId);

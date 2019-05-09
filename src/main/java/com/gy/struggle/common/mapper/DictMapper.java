@@ -1,7 +1,6 @@
 package com.gy.struggle.common.mapper;
 
 import com.gy.struggle.common.domain.DictDO;
-import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 import java.util.Map;
@@ -10,7 +9,6 @@ import java.util.Map;
  * 字典表
  *
  */
-@Mapper
 public interface DictMapper {
 
 	DictDO get(Long id);

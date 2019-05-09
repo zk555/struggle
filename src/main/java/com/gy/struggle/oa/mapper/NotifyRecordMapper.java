@@ -1,7 +1,6 @@
 package com.gy.struggle.oa.mapper;
 
 import com.gy.struggle.oa.domain.NotifyRecordDO;
-import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 import java.util.Map;
@@ -10,7 +9,6 @@ import java.util.Map;
  * 通知通告发送记录
  *
  */
-@Mapper
 public interface NotifyRecordMapper {
 
 	NotifyRecordDO get(Long id);
