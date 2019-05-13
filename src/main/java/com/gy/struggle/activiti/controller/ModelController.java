@@ -1,14 +1,19 @@
 package com.gy.struggle.activiti.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.gy.struggle.common.config.Constant;
 import com.gy.struggle.common.controller.BaseController;
 import com.gy.struggle.common.utils.PageUtils;
 import com.gy.struggle.common.utils.R;
+import org.activiti.bpmn.converter.BpmnXMLConverter;
+import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.editor.constants.ModelDataJsonConstants;
+import org.activiti.editor.language.json.converter.BpmnJsonConverter;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.RepositoryService;
+import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.Model;
 import org.activiti.engine.repository.ModelQuery;
 import org.apache.batik.transcoder.TranscoderInput;
@@ -29,6 +34,14 @@ import static org.activiti.editor.constants.ModelDataJsonConstants.MODEL_DESCRIP
 import static org.activiti.editor.constants.ModelDataJsonConstants.MODEL_ID;
 import static org.activiti.editor.constants.ModelDataJsonConstants.MODEL_NAME;
 
+/**
+ * class_name: ModelController
+ * package: com.gy.struggle.activiti.controller
+ * describe: TODO：引入model可视化模型
+ * creat_user: zhaokai@
+ * creat_date: 2019/5/10
+ * creat_time: 17:32
+ **/
 @RequestMapping("/activiti")
 @RestController
 public class ModelController extends BaseController {
@@ -207,6 +220,59 @@ public class ModelController extends BaseController {
         for (String id : ids) {
             repositoryService.deleteModel(id);
         }
+        return R.ok();
+    }
+
+    @GetMapping("/model/export/{id}")
+    public void exportToXml(@PathVariable("id") String id, HttpServletResponse response) {
+        try {
+            org.activiti.engine.repository.Model modelData = repositoryService.getModel(id);
+            BpmnJsonConverter jsonConverter = new BpmnJsonConverter();
+            JsonNode editorNode = new ObjectMapper().readTree(repositoryService.getModelEditorSource(modelData.getId()));
+            BpmnModel bpmnModel = jsonConverter.convertToBpmnModel(editorNode);
+            BpmnXMLConverter xmlConverter = new BpmnXMLConverter();
+            byte[] bpmnBytes = xmlConverter.convertToXML(bpmnModel);
+
+            ByteArrayInputStream in = new ByteArrayInputStream(bpmnBytes);
+            IOUtils.copy(in, response.getOutputStream());
+            String filename = bpmnModel.getMainProcess().getId() + ".bpmn20.xml";
+            response.setHeader("Content-Disposition", "attachment; filename=" + filename);
+            response.flushBuffer();
+        } catch (Exception e) {
+            throw new ActivitiException("导出model的xml文件失败，模型ID=" + id, e);
+        }
+    }
+
+    @PostMapping("/model/deploy/{id}")
+    public R deploy(@PathVariable("id") String id) throws Exception {
+        if (Constant.DEMO_ACCOUNT.equals(getUsername())) {
+//            return R.error(1, "演示系统不允许修改,完整体验请部署程序");
+        }
+        //获取模型
+        Model modelData = repositoryService.getModel(id);
+        byte[] bytes = repositoryService.getModelEditorSource(modelData.getId());
+
+        if (bytes == null) {
+            return R.error("模型数据为空，请先设计流程并成功保存，再进行发布。");
+        }
+
+        JsonNode modelNode = new ObjectMapper().readTree(bytes);
+
+        BpmnModel model = new BpmnJsonConverter().convertToBpmnModel(modelNode);
+        if (model.getProcesses().size() == 0) {
+            return R.error("数据模型不符要求，请至少设计一条主线流程。");
+        }
+        byte[] bpmnBytes = new BpmnXMLConverter().convertToXML(model);
+
+        //发布流程
+        String processName = modelData.getName() + ".bpmn20.xml";
+        Deployment deployment = repositoryService.createDeployment()
+                .name(modelData.getName())
+                .addString(processName, new String(bpmnBytes, "UTF-8"))
+                .deploy();
+        modelData.setDeploymentId(deployment.getId());
+        repositoryService.saveModel(modelData);
+
         return R.ok();
     }
 }
