@@ -4,6 +4,7 @@ import com.gy.struggle.common.annotation.Log;
 import com.gy.struggle.common.config.Constant;
 import com.gy.struggle.common.controller.BaseController;
 import com.gy.struggle.common.domain.Tree;
+import com.gy.struggle.common.service.DictService;
 import com.gy.struggle.common.utils.MD5Utils;
 import com.gy.struggle.common.utils.PageUtils;
 import com.gy.struggle.common.utils.Query;
@@ -36,6 +37,8 @@ public class UserController extends BaseController {
 	@Autowired
 	RoleService roleService;
 
+	@Autowired
+	DictService dictService;
 	@RequiresPermissions("sys:user:user")
 	@GetMapping("")
 	String user(Model model) {
@@ -188,5 +191,32 @@ public class UserController extends BaseController {
 	@GetMapping("/treeView")
 	String treeView() {
 		return  prefix + "/userTree";
+	}
+
+	@GetMapping("/personal")
+	String personal(Model model) {
+		UserDO userDO  = userService.get(getUserId());
+		model.addAttribute("user",userDO);
+		model.addAttribute("hobbyList",dictService.getHobbyList(userDO));
+		model.addAttribute("sexList",dictService.getSexList());
+		return prefix + "/personal";
+	}
+	@ResponseBody
+	@PostMapping("/uploadImg")
+	R uploadImg(@RequestParam("avatar_file") MultipartFile file, String avatar_data, HttpServletRequest request) {
+		if ("test".equals(getUsername())) {
+//			return R.error(1, "演示系统不允许修改,完整体验请部署程序");
+		}
+		Map<String, Object> result = new HashMap<>();
+		try {
+			result = userService.updatePersonalImg(file, avatar_data, getUserId());
+		} catch (Exception e) {
+			return R.error("更新图像失败！");
+		}
+		if(result!=null && result.size()>0){
+			return R.ok(result);
+		}else {
+			return R.error("更新图像失败！");
+		}
 	}
 }

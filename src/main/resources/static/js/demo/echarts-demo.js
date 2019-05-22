@@ -65,30 +65,30 @@ $(function () {
     //         }
     //     ]
     // };
-    $.getJSON('/echarts/pie',function(lineoption){
-        // lineoption = {
-        //     title: {
-        //         text: 'ECharts 入门示例'
-        //     },
-        //     tooltip : {
-        //         trigger: 'axis'
-        //     },
-        //     legend: {
-        //         data:['销量']
-        //     },
-        //     calculable : true,
-        //     xAxis: {
-        //         data: ["衬衫","羊毛衫","雪纺衫","裤子","高跟鞋","袜子"]
-        //     },
-        //     yAxis: {data:null},
-        //     series: [{
-        //         name: '销量',
-        //         type: 'pie',
-        //         data: [5, 20, 36, 10, 10, 20]
-        //     }]
-        // };
+     $.getJSON('/echarts/pie',function(lineoption){
+      var   line = {
+            title: {
+                text: 'ECharts 入门示例'
+            },
+            tooltip : {
+                trigger: 'axis'
+            },
+            legend: {
+                data:['销量']
+            },
+            calculable : true,
+            xAxis: {
+                data: ["衬衫","羊毛衫","雪纺衫","裤子","高跟鞋","袜子"]
+            },
+            yAxis: {data:null},
+            series: [{
+                name: '销量',
+                type: 'pie',
+                data: [5, 20, 36, 10, 10, 20]
+            }]
+        };
         var lineChart = echarts.init(document.getElementById("echarts-line-chart"));
-        lineChart.setOption(lineoption);
+        lineChart.setOption(line);
         $(window).resize(lineChart.resize);
     })
 

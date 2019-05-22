@@ -4,10 +4,7 @@ import com.gy.struggle.common.config.StruggleConfig;
 import com.gy.struggle.common.domain.FileDO;
 import com.gy.struggle.common.domain.Tree;
 import com.gy.struggle.common.service.FileService;
-import com.gy.struggle.common.utils.BuildTree;
-import com.gy.struggle.common.utils.FileUtil;
-import com.gy.struggle.common.utils.MD5Utils;
-import com.gy.struggle.common.utils.StringUtils;
+import com.gy.struggle.common.utils.*;
 import com.gy.struggle.system.domain.DeptDO;
 import com.gy.struggle.system.domain.UserDO;
 import com.gy.struggle.system.domain.UserRoleDO;
@@ -190,6 +187,46 @@ public class UserServiceImpl implements UserService {
         // 默认顶级菜单为０，根据数据库实际情况调整
         Tree<DeptDO> t = BuildTree.build(trees);
         return t;
+    }
+    @Override
+    public Map<String, Object> updatePersonalImg(MultipartFile file, String avatar_data, Long userId) throws Exception {
+        String fileName = file.getOriginalFilename();
+        fileName = FileUtil.renameToUUID(fileName);
+        FileDO sysFile = new FileDO(FileType.fileType(fileName), "/files/" + fileName, new Date());
+        //获取图片后缀
+        String prefix = fileName.substring((fileName.lastIndexOf(".") + 1));
+        String[] str = avatar_data.split(",");
+        //获取截取的x坐标
+        int x = (int) Math.floor(Double.parseDouble(str[0].split(":")[1]));
+        //获取截取的y坐标
+        int y = (int) Math.floor(Double.parseDouble(str[1].split(":")[1]));
+        //获取截取的高度
+        int h = (int) Math.floor(Double.parseDouble(str[2].split(":")[1]));
+        //获取截取的宽度
+        int w = (int) Math.floor(Double.parseDouble(str[3].split(":")[1]));
+        //获取旋转的角度
+        int r = Integer.parseInt(str[4].split(":")[1].replaceAll("}", ""));
+        try {
+            BufferedImage cutImage = ImageUtils.cutImage(file, x, y, w, h, prefix);
+            BufferedImage rotateImage = ImageUtils.rotateImage(cutImage, r);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            boolean flag = ImageIO.write(rotateImage, prefix, out);
+            //转换后存入数据库
+            byte[] b = out.toByteArray();
+            FileUtil.uploadFile(b, struggleConfig.getUploadPath(), fileName);
+        } catch (Exception e) {
+            throw new Exception("图片裁剪错误！！");
+        }
+        Map<String, Object> result = new HashMap<>();
+        if (sysFileService.save(sysFile) > 0) {
+            UserDO userDO = new UserDO();
+            userDO.setUserId(userId);
+            userDO.setPicId(sysFile.getId());
+            if (userMapper.update(userDO) > 0) {
+                result.put("url", sysFile.getUrl());
+            }
+        }
+        return result;
     }
 }
 
