@@ -1,7 +1,7 @@
 package com.gy.struggle.common.redis.shiro;
 
 /**
- * @author bootdo 1992lcg@163.com
+ * @author SZeke
  * @version V1.0
  */
 

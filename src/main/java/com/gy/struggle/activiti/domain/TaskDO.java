@@ -3,7 +3,7 @@ package com.gy.struggle.activiti.domain;
 import java.util.Map;
 
 /**
- * @author bootdo 1992lcg@163.com
+ * @author SZeke
  */
 public class TaskDO {
     private  String taskId;
