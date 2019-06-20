@@ -148,6 +148,7 @@ public class ZKFramework {
         if(!CommonLocalCache.rpcServerCache.contains(nodeIp)){
             CommonLocalCache.rpcServerCache.add(nodeIp);
         }
+        //缓存 key : Value  ( ip : RPCExportService.proxy)
         if(!CommonLocalCache.rpcProxys.containsKey(nodeIp)){
             CommonLocalCache.rpcProxys.put(nodeIp, new RPCRequestProxy(nodeIp).create(RPCExportService.class));
         }
